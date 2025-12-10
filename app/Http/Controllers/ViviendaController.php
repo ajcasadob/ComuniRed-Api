@@ -7,59 +7,59 @@ use Illuminate\Http\Request;
 
 class ViviendaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // GET /api/viviendas - Listar todas las viviendas
     public function index()
     {
-        //
+        $viviendas = Vivienda::with(['accesosControl', 'incidencias', 'pagos'])->get();
+        return response()->json($viviendas);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
+    // POST /api/viviendas - Crear una nueva vivienda
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'numero_vivienda' => 'required|string|max:10|unique:viviendas',
+            'bloque' => 'nullable|string|max:10',
+            'piso' => 'nullable|string|max:10',
+            'puerta' => 'nullable|string|max:10',
+            'metros_cuadrados' => 'nullable|numeric|min:0',
+            'tipo' => 'required|string|max:20|in:piso,local,garaje',
+        ]);
+
+        $vivienda = Vivienda::create($validated);
+        return response()->json($vivienda, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Vivienda $vivienda)
+    // GET /api/viviendas/{id} - Mostrar una vivienda específica
+    public function show($id)
     {
-        //
+        $vivienda = Vivienda::with(['accesosControl', 'incidencias', 'pagos'])->findOrFail($id);
+        return response()->json($vivienda);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Vivienda $vivienda)
+    // PUT/PATCH /api/viviendas/{id} - Actualizar una vivienda
+    public function update(Request $request, $id)
     {
-        //
+        $vivienda = Vivienda::findOrFail($id);
+
+        $validated = $request->validate([
+            'numero_vivienda' => 'sometimes|string|max:10|unique:viviendas,numero_vivienda,' . $id,
+            'bloque' => 'nullable|string|max:10',
+            'piso' => 'nullable|string|max:10',
+            'puerta' => 'nullable|string|max:10',
+            'metros_cuadrados' => 'nullable|numeric|min:0',
+            'tipo' => 'sometimes|string|max:20|in:piso,local,garaje',
+        ]);
+
+        $vivienda->update($validated);
+        return response()->json($vivienda);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Vivienda $vivienda)
+    // DELETE /api/viviendas/{id} - Eliminar una vivienda
+    public function destroy($id)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Vivienda $vivienda)
-    {
-        //
+        $vivienda = Vivienda::findOrFail($id);
+        $vivienda->delete();
+        return response()->json(['message' => 'Vivienda eliminada correctamente'], 200);
     }
 }

@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('reservas', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre_espacio', 100); // Salon social, Piscina, Pista padel
+            $table->string('nombre_espacio', 100); 
             $table->foreignId('usuario_id')->constrained('users')->cascadeOnDelete();
             $table->date('fecha_reserva');
             $table->time('hora_inicio');
             $table->time('hora_fin');
-            $table->string('estado', 20)->default('confirmada'); // confirmada, cancelada
+            $table->string('estado', 20)->default('confirmada'); 
             $table->timestamps();
         });
     }
