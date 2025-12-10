@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ViviendaController;
 use App\Http\Controllers\AccesoControlController;
 use App\Http\Controllers\IncidenciaController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\PagoController;
 
 // Rutas públicas de autenticación
+Route::post('/register', [RegisteredUserController::class, 'store']);
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 
 // Rutas protegidas con autenticación Sanctum

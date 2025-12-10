@@ -17,7 +17,7 @@ class Comunicacion extends Model
         'activa',
     ];
 
-    // Una comunicación pertenece a un usuario (autor)
+    
     public function autor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'autor_id');

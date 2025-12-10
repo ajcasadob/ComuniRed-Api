@@ -7,14 +7,13 @@ use Illuminate\Http\Request;
 
 class ViviendaController extends Controller
 {
-    // GET /api/viviendas - Listar todas las viviendas
+    
     public function index()
     {
-        $viviendas = Vivienda::with(['accesosControl', 'incidencias', 'pagos'])->get();
-        return response()->json($viviendas);
+        return Vivienda::all();
     }
 
-    // POST /api/viviendas - Crear una nueva vivienda
+    
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -30,14 +29,14 @@ class ViviendaController extends Controller
         return response()->json($vivienda, 201);
     }
 
-    // GET /api/viviendas/{id} - Mostrar una vivienda específica
+    
     public function show($id)
     {
         $vivienda = Vivienda::with(['accesosControl', 'incidencias', 'pagos'])->findOrFail($id);
         return response()->json($vivienda);
     }
 
-    // PUT/PATCH /api/viviendas/{id} - Actualizar una vivienda
+    
     public function update(Request $request, $id)
     {
         $vivienda = Vivienda::findOrFail($id);
@@ -55,7 +54,7 @@ class ViviendaController extends Controller
         return response()->json($vivienda);
     }
 
-    // DELETE /api/viviendas/{id} - Eliminar una vivienda
+    
     public function destroy($id)
     {
         $vivienda = Vivienda::findOrFail($id);
