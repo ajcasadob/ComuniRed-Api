@@ -7,58 +7,87 @@ use Illuminate\Http\Request;
 
 class ViviendaController extends Controller
 {
-    
+    /**
+     * Display a listing of the resource.
+     */
     public function index()
     {
         return Vivienda::all();
     }
 
-    
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'numero_vivienda' => 'required|string|max:10|unique:viviendas',
-            'bloque' => 'nullable|string|max:10',
-            'piso' => 'nullable|string|max:10',
-            'puerta' => 'nullable|string|max:10',
-            'metros_cuadrados' => 'nullable|numeric|min:0',
-            'tipo' => 'required|string|max:20|in:piso,local,garaje',
+        $request->validate([
+            'numero_vivienda' => ['required', 'string', 'max:10', 'unique:viviendas'],
+            'bloque' => ['nullable', 'string', 'max:10'],
+            'piso' => ['nullable', 'string', 'max:10'],
+            'puerta' => ['nullable', 'string', 'max:10'],
+            'metros_cuadrados' => ['nullable', 'numeric', 'min:0'],
+            'tipo' => ['required', 'string', 'max:20', 'in:piso,local,garaje']
         ]);
 
-        $vivienda = Vivienda::create($validated);
+        $vivienda = Vivienda::create([
+            'numero_vivienda' => $request->numero_vivienda,
+            'bloque' => $request->bloque,
+            'piso' => $request->piso,
+            'puerta' => $request->puerta,
+            'metros_cuadrados' => $request->metros_cuadrados,
+            'tipo' => $request->tipo
+        ]);
+        
         return response()->json($vivienda, 201);
     }
 
-    
-    public function show($id)
+    /**
+     * Display the specified resource.
+     */
+    public function show(Vivienda $vivienda)
     {
-        $vivienda = Vivienda::with(['accesosControl', 'incidencias', 'pagos'])->findOrFail($id);
-        return response()->json($vivienda);
+        return response()->json($vivienda, 200);
     }
 
-    
-    public function update(Request $request, $id)
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Vivienda $vivienda)
     {
-        $vivienda = Vivienda::findOrFail($id);
+        //
+    }
 
-        $validated = $request->validate([
-            'numero_vivienda' => 'sometimes|string|max:10|unique:viviendas,numero_vivienda,' . $id,
-            'bloque' => 'nullable|string|max:10',
-            'piso' => 'nullable|string|max:10',
-            'puerta' => 'nullable|string|max:10',
-            'metros_cuadrados' => 'nullable|numeric|min:0',
-            'tipo' => 'sometimes|string|max:20|in:piso,local,garaje',
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Vivienda $vivienda)
+    {
+        $request->validate([
+            'numero_vivienda' => ['required', 'string', 'max:10', 'unique:viviendas,numero_vivienda,' . $vivienda->id],
+            'bloque' => ['nullable', 'string', 'max:10'],
+            'piso' => ['nullable', 'string', 'max:10'],
+            'puerta' => ['nullable', 'string', 'max:10'],
+            'metros_cuadrados' => ['nullable', 'numeric', 'min:0'],
+            'tipo' => ['required', 'string', 'max:20', 'in:piso,local,garaje']
         ]);
-
-        $vivienda->update($validated);
-        return response()->json($vivienda);
+        
+        $vivienda->update($request->all());
+        return response()->json($vivienda, 200);
     }
 
-    
-    public function destroy($id)
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(int $vivienda)
     {
-        $vivienda = Vivienda::findOrFail($id);
-        $vivienda->delete();
-        return response()->json(['message' => 'Vivienda eliminada correctamente'], 200);
+        return Vivienda::destroy($vivienda);
     }
 }

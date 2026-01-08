@@ -12,7 +12,7 @@ class LecturaComunicacionController extends Controller
      */
     public function index()
     {
-        //
+        return LecturaComunicacion::all();
     }
 
     /**
@@ -28,7 +28,19 @@ class LecturaComunicacionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'comunicacion_id' => ['required', 'integer', 'exists:comunicacions,id'],
+            'usuario_id' => ['required', 'integer', 'exists:users,id'],
+            'fecha_lectura' => ['required', 'date']
+        ]);
+        
+        $lectura_comunicacion = LecturaComunicacion::create([
+            'comunicacion_id' => $request->comunicacion_id,
+            'usuario_id' => $request->usuario_id,
+            'fecha_lectura' => $request->fecha_lectura
+        ]);
+        
+        return response()->json($lectura_comunicacion, 201);
     }
 
     /**
@@ -36,7 +48,7 @@ class LecturaComunicacionController extends Controller
      */
     public function show(LecturaComunicacion $lecturaComunicacion)
     {
-        //
+        return response()->json($lecturaComunicacion, 200);
     }
 
     /**
@@ -52,14 +64,21 @@ class LecturaComunicacionController extends Controller
      */
     public function update(Request $request, LecturaComunicacion $lecturaComunicacion)
     {
-        //
+        $request->validate([
+            'comunicacion_id' => ['required', 'integer', 'exists:comunicacions,id'],
+            'usuario_id' => ['required', 'integer', 'exists:users,id'],
+            'fecha_lectura' => ['required', 'date']
+        ]);
+        
+        $lecturaComunicacion->update($request->all());
+        return response()->json($lecturaComunicacion, 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(LecturaComunicacion $lecturaComunicacion)
+    public function destroy(int $lecturaComunicacion)
     {
-        //
+        return LecturaComunicacion::destroy($lecturaComunicacion);
     }
 }

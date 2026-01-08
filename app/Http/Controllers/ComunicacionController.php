@@ -12,7 +12,7 @@ class ComunicacionController extends Controller
      */
     public function index()
     {
-        //
+        return Comunicacion::all();
     }
 
     /**
@@ -28,7 +28,25 @@ class ComunicacionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'titulo' => ['required', 'string', 'max:200'],
+            'contenido' => ['required', 'string'],
+            'tipo' => ['required', 'string', 'max:50'],
+            'autor_id' => ['required', 'integer', 'exists:users,id'],
+            'fecha_publicacion' => ['required', 'date'],
+            'activa' => ['required', 'boolean']
+        ]);
+        
+        $comunicacion = Comunicacion::create([
+            'titulo' => $request->titulo,
+            'contenido' => $request->contenido,
+            'tipo' => $request->tipo,
+            'autor_id' => $request->autor_id,
+            'fecha_publicacion' => $request->fecha_publicacion,
+            'activa' => $request->activa
+        ]);
+        
+        return response()->json($comunicacion, 201);
     }
 
     /**
@@ -36,7 +54,7 @@ class ComunicacionController extends Controller
      */
     public function show(Comunicacion $comunicacion)
     {
-        //
+        return response()->json($comunicacion, 200);
     }
 
     /**
@@ -52,14 +70,24 @@ class ComunicacionController extends Controller
      */
     public function update(Request $request, Comunicacion $comunicacion)
     {
-        //
+        $request->validate([
+            'titulo' => ['required', 'string', 'max:200'],
+            'contenido' => ['required', 'string'],
+            'tipo' => ['required', 'string', 'max:50'],
+            'autor_id' => ['required', 'integer', 'exists:users,id'],
+            'fecha_publicacion' => ['required', 'date'],
+            'activa' => ['required', 'boolean']
+        ]);
+        
+        $comunicacion->update($request->all());
+        return response()->json($comunicacion, 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Comunicacion $comunicacion)
+    public function destroy(int $comunicacion)
     {
-        //
+        return Comunicacion::destroy($comunicacion);
     }
 }

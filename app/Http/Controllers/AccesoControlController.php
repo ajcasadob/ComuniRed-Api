@@ -12,6 +12,7 @@ class AccesoControlController extends Controller
      */
     public function index()
     {
+        return AccesoControl::all();
         //
     }
 
@@ -28,7 +29,25 @@ class AccesoControlController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'tipo_acceso' => ['required', 'string', 'max:50'],
+            'nombre_visitante' => ['required', 'string', 'max:100'],
+            'matricula' => ['nullable', 'string', 'max:20'],
+            'fecha_hora_entrada' => ['required', 'date'],
+            'fecha_hora_salida' => ['nullable', 'date'],
+            'vivienda_id' => ['required', 'integer', 'exists:viviendas,id']
+        ]);
+        
+        $acceso_control = AccesoControl::create([
+            'tipo_acceso' => $request->tipo_acceso,
+            'nombre_visitante' => $request->nombre_visitante,
+            'matricula' => $request->matricula,
+            'fecha_hora_entrada' => $request->fecha_hora_entrada,
+            'fecha_hora_salida' => $request->fecha_hora_salida,
+            'vivienda_id' => $request->vivienda_id
+        ]);
+        
+        return response()->json($acceso_control, 201);
     }
 
     /**
@@ -36,7 +55,7 @@ class AccesoControlController extends Controller
      */
     public function show(AccesoControl $accesoControl)
     {
-        //
+        return response()->json($accesoControl, 200);
     }
 
     /**
@@ -52,14 +71,24 @@ class AccesoControlController extends Controller
      */
     public function update(Request $request, AccesoControl $accesoControl)
     {
-        //
+        $request->validate([
+            'tipo_acceso' => ['required', 'string', 'max:50'],
+            'nombre_visitante' => ['required', 'string', 'max:100'],
+            'matricula' => ['nullable', 'string', 'max:20'],
+            'fecha_hora_entrada' => ['required', 'date'],
+            'fecha_hora_salida' => ['nullable', 'date'],
+            'vivienda_id' => ['required', 'integer', 'exists:viviendas,id']
+        ]);
+        
+        $accesoControl->update($request->all());
+        return response()->json($accesoControl, 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(AccesoControl $accesoControl)
+    public function destroy(int $accesoControl)
     {
-        //
+        return AccesoControl::destroy($accesoControl);
     }
 }

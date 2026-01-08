@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('titulo', 200);
             $table->text('contenido');
-            $table->string('tipo', 30); // aviso, noticia, urgente
+            $table->string('tipo', 30); 
             $table->foreignId('autor_id')->constrained('users')->cascadeOnDelete();
             $table->timestamp('fecha_publicacion')->useCurrent();
             $table->boolean('activa')->default(true);

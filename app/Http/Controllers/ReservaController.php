@@ -12,7 +12,7 @@ class ReservaController extends Controller
      */
     public function index()
     {
-        //
+        return Reserva::all();
     }
 
     /**
@@ -28,7 +28,25 @@ class ReservaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nombre_espacio' => ['required', 'string', 'max:100'],
+            'usuario_id' => ['required', 'integer', 'exists:users,id'],
+            'fecha_reserva' => ['required', 'date'],
+            'hora_inicio' => ['required', 'date_format:H:i'],
+            'hora_fin' => ['required', 'date_format:H:i', 'after:hora_inicio'],
+            'estado' => ['required', 'string', 'max:50']
+        ]);
+        
+        $reserva = Reserva::create([
+            'nombre_espacio' => $request->nombre_espacio,
+            'usuario_id' => $request->usuario_id,
+            'fecha_reserva' => $request->fecha_reserva,
+            'hora_inicio' => $request->hora_inicio,
+            'hora_fin' => $request->hora_fin,
+            'estado' => $request->estado
+        ]);
+        
+        return response()->json($reserva, 201);
     }
 
     /**
@@ -36,7 +54,7 @@ class ReservaController extends Controller
      */
     public function show(Reserva $reserva)
     {
-        //
+        return response()->json($reserva, 200);
     }
 
     /**
@@ -52,14 +70,24 @@ class ReservaController extends Controller
      */
     public function update(Request $request, Reserva $reserva)
     {
-        //
+        $request->validate([
+            'nombre_espacio' => ['required', 'string', 'max:100'],
+            'usuario_id' => ['required', 'integer', 'exists:users,id'],
+            'fecha_reserva' => ['required', 'date'],
+            'hora_inicio' => ['required', 'date_format:H:i'],
+            'hora_fin' => ['required', 'date_format:H:i', 'after:hora_inicio'],
+            'estado' => ['required', 'string', 'max:50']
+        ]);
+        
+        $reserva->update($request->all());
+        return response()->json($reserva, 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Reserva $reserva)
+    public function destroy(int $reserva)
     {
-        //
+        return Reserva::destroy($reserva);
     }
 }
