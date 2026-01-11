@@ -7,25 +7,11 @@ use Illuminate\Http\Request;
 
 class PagoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        return Pago::all();
+        return Pago::with(['vivienda'])->get(); 
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -48,28 +34,14 @@ class PagoController extends Controller
             'fecha_pago' => $request->fecha_pago
         ]);
         
-        return response()->json($pago, 201);
+        return response()->json($pago->load('vivienda'), 201); 
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Pago $pago)
     {
-        return response()->json($pago, 200);
+        return response()->json($pago->load('vivienda'), 200); 
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Pago $pago)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Pago $pago)
     {
         $request->validate([
@@ -83,12 +55,9 @@ class PagoController extends Controller
         ]);
         
         $pago->update($request->all());
-        return response()->json($pago, 200);
+        return response()->json($pago->load('vivienda'), 200); 
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(int $pago)
     {
         return Pago::destroy($pago);

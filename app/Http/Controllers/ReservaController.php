@@ -7,25 +7,30 @@ use Illuminate\Http\Request;
 
 class ReservaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
-    {
-        return Reserva::all();
+{
+    try {
+        \Log::info('Intentando cargar reservas...');
+        
+        $reservas = Reserva::with(['usuario.vivienda'])->get();
+        
+        \Log::info('Reservas cargadas: ' . $reservas->count());
+        
+        return $reservas;
+        
+    } catch (\Exception $e) {
+        \Log::error('Error al cargar reservas: ' . $e->getMessage());
+        \Log::error('Stack trace: ' . $e->getTraceAsString());
+        
+        return response()->json([
+            'error' => $e->getMessage(),
+            'line' => $e->getLine(),
+            'file' => $e->getFile()
+        ], 500);
     }
+}
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -46,28 +51,14 @@ class ReservaController extends Controller
             'estado' => $request->estado
         ]);
         
-        return response()->json($reserva, 201);
+        return response()->json($reserva->load('usuario.vivienda'), 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Reserva $reserva)
     {
-        return response()->json($reserva, 200);
+        return response()->json($reserva->load('usuario.vivienda'), 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Reserva $reserva)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Reserva $reserva)
     {
         $request->validate([
@@ -80,12 +71,9 @@ class ReservaController extends Controller
         ]);
         
         $reserva->update($request->all());
-        return response()->json($reserva, 200);
+        return response()->json($reserva->load('usuario.vivienda'), 200);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(int $reserva)
     {
         return Reserva::destroy($reserva);
