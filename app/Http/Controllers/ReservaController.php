@@ -7,28 +7,16 @@ use Illuminate\Http\Request;
 
 class ReservaController extends Controller
 {
-    public function index()
+   public function index()
 {
-    try {
-        \Log::info('Intentando cargar reservas...');
-        
-        $reservas = Reserva::with(['usuario.vivienda'])->get();
-        
-        \Log::info('Reservas cargadas: ' . $reservas->count());
-        
-        return $reservas;
-        
-    } catch (\Exception $e) {
-        \Log::error('Error al cargar reservas: ' . $e->getMessage());
-        \Log::error('Stack trace: ' . $e->getTraceAsString());
-        
-        return response()->json([
-            'error' => $e->getMessage(),
-            'line' => $e->getLine(),
-            'file' => $e->getFile()
-        ], 500);
-    }
+    $reservas = Reserva::with(['usuario.vivienda'])
+        ->orderBy('fecha_reserva', 'desc')
+        ->orderBy('hora_inicio', 'desc')
+        ->get();
+    
+    return response()->json($reservas, 200);
 }
+
 
 
     public function store(Request $request)
