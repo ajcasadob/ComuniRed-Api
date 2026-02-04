@@ -10,6 +10,12 @@ use App\Http\Controllers\ComunicacionController;
 use App\Http\Controllers\LecturaComunicacionController;
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\PagoController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\DashboardController;
+
+
+use Illuminate\Http\Request;
+
 
 // Rutas públicas de autenticación
 Route::post('/register', [RegisteredUserController::class, 'store']);
@@ -23,12 +29,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
+
+    // Usuarios (añadir después de la línea de Viviendas)
+    Route::patch('usuarios/{usuario}/asignarvivienda', [UserController::class, 'asignarVivienda']);
+    
+    Route::apiResource('usuarios', UserController::class)->except(['store']); // store ya está en register
     
     // Viviendas
     Route::apiResource('viviendas', ViviendaController::class);
     
-    // Accesos de control
-    Route::apiResource('accesos-control', AccesoControlController::class);
+    
+
     
     // Incidencias
     Route::apiResource('incidencias', IncidenciaController::class);
@@ -44,4 +55,5 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Pagos
     Route::apiResource('pagos', PagoController::class);
+    Route::get('/dashboard/estadisticas', [DashboardController::class, 'getEstadisticas']);
 });

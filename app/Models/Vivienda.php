@@ -37,9 +37,5 @@ class Vivienda extends Model
         return $this->hasMany(Pago::class);
     }
 
-    // Una vivienda puede tener múltiples registros de acceso
-    public function accesosControl(): HasMany
-    {
-        return $this->hasMany(AccesoControl::class);
-    }
+    
 }
