@@ -9,6 +9,8 @@ use App\Models\User;
 use App\Models\Vivienda;
 
 
+
+
 class Incidencia extends Model
 {
     use HasFactory;
