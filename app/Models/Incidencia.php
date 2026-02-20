@@ -24,7 +24,6 @@ class Incidencia extends Model
         'usuario_id',
         'vivienda_id',
         'fecha_resolucion',
-        'imagen_url',
     ];
 
     // Una incidencia pertenece a un usuario (quien la reporta)

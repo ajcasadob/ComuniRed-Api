@@ -21,7 +21,6 @@ return new class extends Migration
             $table->foreignId('usuario_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('vivienda_id')->nullable()->constrained('viviendas')->nullOnDelete();
             $table->timestamp('fecha_resolucion')->nullable();
-            $table->string('imagen_url', 255)->nullable();
             $table->timestamps();
         });
     }

@@ -39,7 +39,6 @@ class IncidenciaController extends Controller
             'usuario_id' => ['required', 'integer', 'exists:users,id'],
             'vivienda_id' => ['nullable', 'integer', 'exists:viviendas,id'],
             'fecha_resolucion' => ['nullable', 'date'],
-            'imagen_url' => ['nullable', 'string', 'max:500']
         ]);
         
         $incidencia = Incidencia::create([
@@ -51,7 +50,6 @@ class IncidenciaController extends Controller
             'usuario_id' => $request->usuario_id,
             'vivienda_id' => $request->vivienda_id,
             'fecha_resolucion' => $request->fecha_resolucion,
-            'imagen_url' => $request->imagen_url
         ]);
         
         return response()->json($incidencia, 201);
@@ -87,7 +85,6 @@ class IncidenciaController extends Controller
             'usuario_id' => ['required', 'integer', 'exists:users,id'],
             'vivienda_id' => ['nullable', 'integer', 'exists:viviendas,id'],
             'fecha_resolucion' => ['nullable', 'date'],
-            'imagen_url' => ['nullable', 'string', 'max:500']
         ]);
         
         $incidencia->update($request->all());
