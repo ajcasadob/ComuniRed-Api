@@ -15,9 +15,11 @@ class DashboardController extends Controller
         $hoy = Carbon::now();
         
         // Reservas activas (confirmadas y futuras)
-        $reservasActivas = Reserva::where('fecha_reserva', '>=', $hoy)
-            ->whereIn('estado', ['confirmada', 'pendiente'])
-            ->count();
+      
+        $reservasActivas = Reserva::where('fecha_reserva', '>=', Carbon::today())
+                ->whereIn('estado', ['confirmada', 'pendiente'])
+                ->count();
+
         
         // Incidencias pendientes
         $incidenciasPendientes = Incidencia::whereIn('estado', ['pendiente', 'en proceso'])
@@ -25,11 +27,8 @@ class DashboardController extends Controller
         
         // Incidencias urgentes
         $incidenciasUrgentes = Incidencia::whereIn('estado', ['pendiente', 'en proceso'])
-            ->where(function($query) {
-                $query->where('categoria', 'LIKE', '%urgente%')
-                    ->orWhere('categoria', 'LIKE', '%alta%');
-            })
-            ->count();
+                ->where('prioridad', 'alta')
+                ->count();
         
         // Tasa de cobro
         $totalPagos = Pago::sum('importe');

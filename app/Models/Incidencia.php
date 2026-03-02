@@ -20,6 +20,7 @@ class Incidencia extends Model
         'descripcion',
         'ubicacion',
         'categoria',
+        'prioridad',
         'estado',
         'usuario_id',
         'vivienda_id',
