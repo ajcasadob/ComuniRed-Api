@@ -9,48 +9,40 @@ use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         return User::with('vivienda')->get();
     }
 
-    /**
-     * Display the specified user.
-     */
-    public function show(User $user)
+    public function show(User $usuario)
     {
-        return response()->json($user->load('vivienda'), 200);
+        return response()->json($usuario->load('vivienda'), 200);
     }
 
-    /**
-     * Update the specified user.
-     */
-    public function update(Request $request, User $user)
-    {
-        $request->validate([
-            'name' => ['sometimes', 'string', 'max:255'],
-            'email' => ['sometimes', 'email', 'max:255', 'unique:users,email,' . $user->id],
-            'role' => ['sometimes', 'string', 'in:admin,user,guest'],
-            'vivienda_id' => ['nullable', 'exists:viviendas,id'],
-            'password' => ['sometimes', 'confirmed', Password::defaults()],
-        ]);
+   public function update(Request $request, User $usuario)
+{
+    $request->validate([
+        'name'             => ['sometimes', 'string', 'max:255'],
+        'email'            => ['sometimes', 'email', 'max:255', 'unique:users,email,' . $usuario->id],
+        'role'             => ['sometimes', 'string', 'in:admin,user,guest'],
+        'vivienda_id'      => ['nullable', 'exists:viviendas,id'],
+        'current_password' => ['required_with:password', 'current_password'],
+        'password'         => ['sometimes', 'confirmed', Password::defaults()],
+    ]);
 
-        $data = $request->except('password');
-        
-        if ($request->has('password')) {
-            $data['password'] = Hash::make($request->password);
-        }
+    $data = $request->except(['password', 'current_password', 'password_confirmation']);
 
-        $user->update($data);
-        
-        // Recargar el modelo desde la base de datos
-        $user->refresh();
-        
-        return response()->json($user->load('vivienda'), 200);
+    if ($request->has('password')) {
+        $data['password'] = Hash::make($request->password);
     }
+
+    $usuario->update($data);
+    $usuario->refresh();
+
+    return response()->json($usuario->load('vivienda'), 200);
+}
+
+
     public function asignarVivienda(Request $request, User $usuario)
     {
         $request->validate([
@@ -63,12 +55,9 @@ class UserController extends Controller
         return response()->json($usuario->load('vivienda'), 200);
     }
 
-    /**
-     * Remove the specified user.
-     */
-    public function destroy(User $user)
+    public function destroy(User $usuario)
     {
-        $user->delete();
+        $usuario->delete();
         return response()->json(['message' => 'Usuario eliminado correctamente'], 200);
     }
 }
