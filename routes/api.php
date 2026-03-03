@@ -54,6 +54,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('reservas', ReservaController::class);
     
     // Pagos
+    Route::get('/pagos/mis-pagos', [PagoController::class, 'misPagos']);
     Route::apiResource('pagos', PagoController::class);
     Route::get('/dashboard/estadisticas', [DashboardController::class, 'getEstadisticas']);
 });

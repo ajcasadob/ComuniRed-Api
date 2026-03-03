@@ -58,6 +58,21 @@ class PagoController extends Controller
         return response()->json($pago->load('vivienda'), 200); 
     }
 
+    public function misPagos(Request $request)
+{
+    $viviendaId = $request->user()->vivienda_id;
+
+    if (!$viviendaId) {
+        return response()->json([], 200);
+    }
+
+    return Pago::with('vivienda')
+        ->where('vivienda_id', $viviendaId)
+        ->orderBy('fecha_vencimiento', 'desc')
+        ->get();
+}
+
+
     public function destroy(int $pago)
     {
         return Pago::destroy($pago);
