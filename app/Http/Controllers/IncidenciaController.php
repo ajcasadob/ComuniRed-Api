@@ -77,28 +77,43 @@ class IncidenciaController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, Incidencia $incidencia)
-    {
-        $request->validate([
-            'titulo' => ['required', 'string', 'max:200'],
-            'descripcion' => ['required', 'string'],
-            'ubicacion' => ['required', 'string', 'max:255'],
-            'categoria' => ['required', 'string', 'max:50'],
-            'prioridad' => ['nullable', 'string', 'in:baja,media,alta'],
-            'estado' => ['required', 'string', 'max:50'],
-            'usuario_id' => ['required', 'integer', 'exists:users,id'],
-            'vivienda_id' => ['nullable', 'integer', 'exists:viviendas,id'],
-            'fecha_resolucion' => ['nullable', 'date'],
-        ]);
-        
-        $incidencia->update($request->all());
-        return response()->json($incidencia, 200);
+{
+    $user = $request->user();
+
+    if ($user->role !== 'admin' && $incidencia->usuario_id !== $user->id) {
+        return response()->json([
+            'message' => 'No tienes permiso para modificar esta incidencia'
+        ], 403);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(int $incidencia)
-    {
-        return Incidencia::destroy($incidencia);
+    $request->validate([
+        'titulo'           => ['required', 'string', 'max:200'],
+        'descripcion'      => ['required', 'string'],
+        'ubicacion'        => ['required', 'string', 'max:255'],
+        'categoria'        => ['required', 'string', 'max:50'],
+        'prioridad'        => ['nullable', 'string', 'in:baja,media,alta'],
+        'estado'           => ['required', 'string', 'max:50'],
+        'usuario_id'       => ['required', 'integer', 'exists:users,id'],
+        'vivienda_id'      => ['nullable', 'integer', 'exists:viviendas,id'],
+        'fecha_resolucion' => ['nullable', 'date'],
+    ]);
+
+    $incidencia->update($request->all());
+    return response()->json($incidencia, 200);
+}
+
+public function destroy(Incidencia $incidencia, Request $request)
+{
+    $user = $request->user();
+
+    if ($user->role !== 'admin' && $incidencia->usuario_id !== $user->id) {
+        return response()->json([
+            'message' => 'No tienes permiso para eliminar esta incidencia'
+        ], 403);
     }
+
+    $incidencia->delete();
+    return response()->json(['message' => 'Incidencia eliminada correctamente'], 200);
+}
+
 }
