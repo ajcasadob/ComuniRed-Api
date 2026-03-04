@@ -4,116 +4,131 @@ namespace App\Http\Controllers;
 
 use App\Models\Incidencia;
 use Illuminate\Http\Request;
-
-
+use Illuminate\Support\Facades\Storage;
 
 class IncidenciaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         return Incidencia::all();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
-            'titulo' => ['required', 'string', 'max:200'],
-            'descripcion' => ['required', 'string'],
-            'ubicacion' => ['required', 'string', 'max:255'],
-            'categoria' => ['required', 'string', 'max:50'],
-            'prioridad' => ['nullable', 'string', 'in:baja,media,alta'],
-            'estado' => ['required', 'string', 'max:50'],
-            'usuario_id' => ['required', 'integer', 'exists:users,id'],
-            'vivienda_id' => ['nullable', 'integer', 'exists:viviendas,id'],
+            'titulo'           => ['required', 'string', 'max:200'],
+            'descripcion'      => ['required', 'string'],
+            'ubicacion'        => ['required', 'string', 'max:255'],
+            'categoria'        => ['required', 'string', 'max:50'],
+            'prioridad'        => ['nullable', 'string', 'in:baja,media,alta'],
+            'estado'           => ['required', 'string', 'max:50'],
+            'usuario_id'       => ['required', 'integer', 'exists:users,id'],
+            'vivienda_id'      => ['nullable', 'integer', 'exists:viviendas,id'],
             'fecha_resolucion' => ['nullable', 'date'],
+            'foto'             => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'], // ← nuevo
         ]);
-        
+
+        $fotoPath = null;
+        if ($request->hasFile('foto')) {
+            $fotoPath = $request->file('foto')->store('incidencias', 'public');
+        }
+
         $incidencia = Incidencia::create([
-            'titulo' => $request->titulo,
-            'descripcion' => $request->descripcion,
-            'ubicacion' => $request->ubicacion,
-            'categoria' => $request->categoria,
-            'prioridad' => $request->prioridad ?? 'baja',
-            'estado' => $request->estado,
-            'usuario_id' => $request->usuario_id,
-            'vivienda_id' => $request->vivienda_id,
+            'titulo'           => $request->titulo,
+            'descripcion'      => $request->descripcion,
+            'ubicacion'        => $request->ubicacion,
+            'categoria'        => $request->categoria,
+            'prioridad'        => $request->prioridad ?? 'baja',
+            'estado'           => $request->estado,
+            'usuario_id'       => $request->usuario_id,
+            'vivienda_id'      => $request->vivienda_id,
             'fecha_resolucion' => $request->fecha_resolucion,
+            'foto'             => $fotoPath, // ← nuevo
         ]);
-        
+
         return response()->json($incidencia, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Incidencia $incidencia)
     {
         return response()->json($incidencia, 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Incidencia $incidencia)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Incidencia $incidencia)
-{
-    $user = $request->user();
+    {
+        $user = $request->user();
 
-    if ($user->role !== 'admin' && $incidencia->usuario_id !== $user->id) {
-        return response()->json([
-            'message' => 'No tienes permiso para modificar esta incidencia'
-        ], 403);
+        if ($user->role !== 'admin' && $incidencia->usuario_id !== $user->id) {
+            return response()->json([
+                'message' => 'No tienes permiso para modificar esta incidencia'
+            ], 403);
+        }
+
+        $request->validate([
+            'titulo'           => ['required', 'string', 'max:200'],
+            'descripcion'      => ['required', 'string'],
+            'ubicacion'        => ['required', 'string', 'max:255'],
+            'categoria'        => ['required', 'string', 'max:50'],
+            'prioridad'        => ['nullable', 'string', 'in:baja,media,alta'],
+            'estado'           => ['required', 'string', 'max:50'],
+            'usuario_id'       => ['required', 'integer', 'exists:users,id'],
+            'vivienda_id'      => ['nullable', 'integer', 'exists:viviendas,id'],
+            'fecha_resolucion' => ['nullable', 'date'],
+            'foto'             => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'], // ← nuevo
+        ]);
+
+        $fotoPath = $incidencia->foto; // mantiene la foto anterior por defecto
+
+        if ($request->hasFile('foto')) {
+            // Borra la foto anterior si existía
+            if ($incidencia->foto) {
+                Storage::disk('public')->delete($incidencia->foto);
+            }
+            $fotoPath = $request->file('foto')->store('incidencias', 'public');
+        }
+
+        $incidencia->update([
+            'titulo'           => $request->titulo,
+            'descripcion'      => $request->descripcion,
+            'ubicacion'        => $request->ubicacion,
+            'categoria'        => $request->categoria,
+            'prioridad'        => $request->prioridad ?? 'baja',
+            'estado'           => $request->estado,
+            'usuario_id'       => $request->usuario_id,
+            'vivienda_id'      => $request->vivienda_id,
+            'fecha_resolucion' => $request->fecha_resolucion,
+            'foto'             => $fotoPath, // ← nuevo
+        ]);
+
+        return response()->json($incidencia, 200);
     }
 
-    $request->validate([
-        'titulo'           => ['required', 'string', 'max:200'],
-        'descripcion'      => ['required', 'string'],
-        'ubicacion'        => ['required', 'string', 'max:255'],
-        'categoria'        => ['required', 'string', 'max:50'],
-        'prioridad'        => ['nullable', 'string', 'in:baja,media,alta'],
-        'estado'           => ['required', 'string', 'max:50'],
-        'usuario_id'       => ['required', 'integer', 'exists:users,id'],
-        'vivienda_id'      => ['nullable', 'integer', 'exists:viviendas,id'],
-        'fecha_resolucion' => ['nullable', 'date'],
-    ]);
+    public function destroy(Incidencia $incidencia, Request $request)
+    {
+        $user = $request->user();
 
-    $incidencia->update($request->all());
-    return response()->json($incidencia, 200);
-}
+        if ($user->role !== 'admin' && $incidencia->usuario_id !== $user->id) {
+            return response()->json([
+                'message' => 'No tienes permiso para eliminar esta incidencia'
+            ], 403);
+        }
 
-public function destroy(Incidencia $incidencia, Request $request)
-{
-    $user = $request->user();
+        // Borra la foto del storage al eliminar
+        if ($incidencia->foto) {
+            Storage::disk('public')->delete($incidencia->foto);
+        }
 
-    if ($user->role !== 'admin' && $incidencia->usuario_id !== $user->id) {
-        return response()->json([
-            'message' => 'No tienes permiso para eliminar esta incidencia'
-        ], 403);
+        $incidencia->delete();
+        return response()->json(['message' => 'Incidencia eliminada correctamente'], 200);
     }
-
-    $incidencia->delete();
-    return response()->json(['message' => 'Incidencia eliminada correctamente'], 200);
-}
-
 }
