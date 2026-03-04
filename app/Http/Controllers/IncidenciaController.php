@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Incidencia;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class IncidenciaController extends Controller
 {
@@ -30,13 +29,7 @@ class IncidenciaController extends Controller
             'usuario_id'       => ['required', 'integer', 'exists:users,id'],
             'vivienda_id'      => ['nullable', 'integer', 'exists:viviendas,id'],
             'fecha_resolucion' => ['nullable', 'date'],
-            'foto'             => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'], // ← nuevo
         ]);
-
-        $fotoPath = null;
-        if ($request->hasFile('foto')) {
-            $fotoPath = $request->file('foto')->store('incidencias', 'public');
-        }
 
         $incidencia = Incidencia::create([
             'titulo'           => $request->titulo,
@@ -48,7 +41,6 @@ class IncidenciaController extends Controller
             'usuario_id'       => $request->usuario_id,
             'vivienda_id'      => $request->vivienda_id,
             'fecha_resolucion' => $request->fecha_resolucion,
-            'foto'             => $fotoPath, // ← nuevo
         ]);
 
         return response()->json($incidencia, 201);
@@ -84,18 +76,7 @@ class IncidenciaController extends Controller
             'usuario_id'       => ['required', 'integer', 'exists:users,id'],
             'vivienda_id'      => ['nullable', 'integer', 'exists:viviendas,id'],
             'fecha_resolucion' => ['nullable', 'date'],
-            'foto'             => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'], // ← nuevo
         ]);
-
-        $fotoPath = $incidencia->foto; // mantiene la foto anterior por defecto
-
-        if ($request->hasFile('foto')) {
-            // Borra la foto anterior si existía
-            if ($incidencia->foto) {
-                Storage::disk('public')->delete($incidencia->foto);
-            }
-            $fotoPath = $request->file('foto')->store('incidencias', 'public');
-        }
 
         $incidencia->update([
             'titulo'           => $request->titulo,
@@ -107,7 +88,6 @@ class IncidenciaController extends Controller
             'usuario_id'       => $request->usuario_id,
             'vivienda_id'      => $request->vivienda_id,
             'fecha_resolucion' => $request->fecha_resolucion,
-            'foto'             => $fotoPath, // ← nuevo
         ]);
 
         return response()->json($incidencia, 200);
@@ -121,11 +101,6 @@ class IncidenciaController extends Controller
             return response()->json([
                 'message' => 'No tienes permiso para eliminar esta incidencia'
             ], 403);
-        }
-
-        // Borra la foto del storage al eliminar
-        if ($incidencia->foto) {
-            Storage::disk('public')->delete($incidencia->foto);
         }
 
         $incidencia->delete();
