@@ -52,9 +52,12 @@ class ComunicacionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Comunicacion $comunicacion)
+    
+
+    public function show($id)
     {
-        return response()->json($comunicacion, 200);
+    $comunicacion = Comunicacion::find($id);
+    return response()->json($comunicacion, 200);
     }
 
     /**
@@ -68,9 +71,10 @@ class ComunicacionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Comunicacion $comunicacion)
-    {
-        $request->validate([
+    public function update(Request $request, $id)
+    {   
+        $comunicacion = Comunicacion::find($id);
+        $data=$request->validate([
             'titulo' => ['required', 'string', 'max:200'],
             'contenido' => ['required', 'string'],
             'tipo' => ['required', 'string', 'max:50'],
@@ -79,7 +83,7 @@ class ComunicacionController extends Controller
             'activa' => ['required', 'boolean']
         ]);
         
-        $comunicacion->update($request->all());
+        $comunicacion->update($data);
         return response()->json($comunicacion, 200);
     }
 
